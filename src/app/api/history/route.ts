@@ -51,3 +51,33 @@ export async function POST(req: Request) {
         return NextResponse.json({ message: "Error saving transcript" }, { status: 500 });
     }
 }
+
+export async function PATCH(req: Request) {
+    const session = await getServerSession(authOptions);
+
+    if (!session || !session.user) {
+        return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    try {
+        const { id, summary } = await req.json();
+
+        if (!id) {
+            return NextResponse.json({ message: "Record ID is required" }, { status: 400 });
+        }
+
+        const updatedRecord = await prisma.transcriptHistory.update({
+            where: {
+                id,
+                userId: session.user.id // Ensure user owns the record
+            },
+            data: { summary }
+        });
+
+        return NextResponse.json({ message: "Updated successfully", record: updatedRecord }, { status: 200 });
+    } catch (err) {
+        console.error("Update error:", err);
+        return NextResponse.json({ message: "Error updating transcript" }, { status: 500 });
+    }
+}
+
