@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  password      String
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  settings      Settings?
+  transcripts   TranscriptHistory[]
+}
+
+model Settings {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  llmProvider   String   @default("custom") // e.g., 'openai', 'anthropic', 'custom'
+  llmUrl        String?  // Custom endpoint URL
+  llmApiKey     String?  // Stored encrypted or plain if strictly local constraint allows (we'll use plain for this prototype as it's a local app, but warn user)
+  llmModel      String?
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model TranscriptHistory {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  title         String   @default("Untitled Transcript")
+  transcript    String   // The full speaker-labeled transcript
+  summary       String?  // The LLM generated summary
+  duration      Int?     // Duration in seconds
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
