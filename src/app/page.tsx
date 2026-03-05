@@ -105,26 +105,9 @@ export default function Home() {
 
   return (
     <div className="container">
-      <nav className="navbar">
-        <div className="logo">
-          <div className="logo-icon"></div>
-          Protocol
-        </div>
-        <div className="nav-links" style={{ display: "flex", alignItems: "center" }}>
-          <a href="/" className="nav-link active">Dashboard</a>
-          <a href="/history" className="nav-link">History</a>
-          <a href="/settings" className="nav-link">Settings</a>
-          <button
-            onClick={() => signOut({ callbackUrl: '/login' })}
-            className="nav-link"
-            style={{ background: 'none', border: 'none', cursor: 'pointer', marginLeft: '1rem' }}
-          >
-            Logout
-          </button>
-        </div>
-      </nav>
-
       <main className="main-content">
+
+
         <div style={{ textAlign: "center" }}>
           <h1 className="title">Secure, local transcription.</h1>
           <p className="subtitle">Record your conversations safely on-device with zero privacy compromise.</p>
@@ -247,3 +230,5 @@ export default function Home() {
     </div>
   );
 }
+
+

@@ -27,19 +27,9 @@ export default function History() {
 
     return (
         <div className="container">
-            <nav className="navbar">
-                <div className="logo">
-                    <div className="logo-icon"></div>
-                    Protocol
-                </div>
-                <div className="nav-links">
-                    <a href="/" className="nav-link">Dashboard</a>
-                    <a href="/history" className="nav-link active">History</a>
-                    <a href="/settings" className="nav-link">Settings</a>
-                </div>
-            </nav>
-
             <main className="main-content">
+
+
                 <div style={{ textAlign: "center", marginBottom: "2rem" }}>
                     <h1 className="title">Your History</h1>
                     <p className="subtitle">Review your past local transcriptions and summaries securely.</p>
@@ -85,3 +75,5 @@ export default function History() {
         </div>
     );
 }
+
+

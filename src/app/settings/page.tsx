@@ -51,19 +51,9 @@ export default function Settings() {
 
     return (
         <div className="container">
-            <nav className="navbar">
-                <div className="logo">
-                    <div className="logo-icon"></div>
-                    Protocol
-                </div>
-                <div className="nav-links">
-                    <a href="/" className="nav-link">Dashboard</a>
-                    <a href="/history" className="nav-link">History</a>
-                    <a href="/settings" className="nav-link active">Settings</a>
-                </div>
-            </nav>
-
             <main className="main-content">
+
+
                 <div style={{ textAlign: "center" }}>
                     <h1 className="title">Summarization Settings</h1>
                     <p className="subtitle">Configure the local or remote LLM used to summarize your transcripts.</p>
@@ -121,3 +111,5 @@ export default function Settings() {
         </div>
     );
 }
+
+
