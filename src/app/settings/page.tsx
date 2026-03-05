@@ -8,7 +8,9 @@ export default function Settings() {
     const [llmApiKey, setLlmApiKey] = useState("");
     const [llmModel, setLlmModel] = useState("gpt-4o");
     const [isSaving, setIsSaving] = useState(false);
+    const [isTesting, setIsTesting] = useState(false);
     const [message, setMessage] = useState("");
+
 
     useEffect(() => {
         // Fetch user settings on mount
@@ -48,6 +50,31 @@ export default function Settings() {
             setIsSaving(false);
         }
     };
+
+    const handleTestConnection = async () => {
+        setIsTesting(true);
+        setMessage("");
+
+        try {
+            const res = await fetch('/api/summarize', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ transcript: "This is a test message to verify the connection." }),
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+                setMessage("Connection successful! LLM is responding.");
+            } else {
+                setMessage(`Connection failed: ${data.message}`);
+            }
+        } catch (err: any) {
+            setMessage(`Connection error: ${err.message}`);
+        } finally {
+            setIsTesting(false);
+        }
+    };
+
 
     return (
         <div className="container">
@@ -96,9 +123,21 @@ export default function Settings() {
                             />
                         </div>
 
-                        <button type="submit" className="btn btn-primary" disabled={isSaving} style={{ marginTop: "1rem" }}>
-                            {isSaving ? "Saving..." : "Save Configuration"}
-                        </button>
+                        <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
+                            <button type="submit" className="btn btn-primary" disabled={isSaving || isTesting} style={{ flex: 1 }}>
+                                {isSaving ? "Saving..." : "Save Configuration"}
+                            </button>
+                            <button
+                                type="button"
+                                className="btn btn-secondary"
+                                onClick={handleTestConnection}
+                                disabled={isSaving || isTesting || !llmUrl}
+                                style={{ flex: 1 }}
+                            >
+                                {isTesting ? "Testing..." : "Test Connection"}
+                            </button>
+                        </div>
+
 
                         {message && (
                             <div style={{ marginTop: "1rem", textAlign: "center", color: message.includes("success") ? "var(--accent-success)" : "var(--accent-danger)" }}>

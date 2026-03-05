@@ -61,14 +61,21 @@ export async function POST(req: Request) {
 
         if (!response.ok) {
             const errorText = await response.text();
-            console.error("LLM Error:", errorText);
-            return NextResponse.json({ message: `LLM API Error: ${response.statusText}` }, { status: response.status });
+            console.error(`LLM API Error (${response.status}) at ${settings.llmUrl}:`, errorText);
+
+            let message = `LLM API Error: ${response.statusText}`;
+            if (response.status === 404) {
+                message = "LLM Endpoint Not Found (404). Please verify your API URL in Settings (e.g., ensure it includes '/v1/chat/completions').";
+            }
+
+            return NextResponse.json({ message }, { status: response.status });
         }
 
         const data = await response.json();
         const summary = data.choices?.[0]?.message?.content || "No summary generated.";
 
         return NextResponse.json({ summary }, { status: 200 });
+
 
     } catch (err: any) {
         console.error("Summarization error:", err);
