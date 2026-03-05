@@ -127,9 +127,19 @@ export default function Home() {
           <div style={{ minHeight: "80px", color: "var(--text-secondary)", fontSize: "1.1rem" }}>
             {isRecording && "Recording in progress... (Audio kept locally)"}
             {isTranscribing && !progress && "Initializing local Whisper model..."}
-            {isTranscribing && progress && `Loading model: ${progress.status} ${progress.progress ? Math.round(progress.progress) + "%" : ""}`}
+            {isTranscribing && progress && (
+              <>
+                {progress.status === 'init' && "Initializing local Whisper model..."}
+                {progress.status === 'decoding' && "Processing audio data..."}
+                {progress.status === 'loading' && `Loading model: ${Math.round(progress.progress || 0)}%`}
+                {progress.status === 'transcribing' && "Transcribing audio... (This may take a moment)"}
+                {progress.status === 'error' && <span style={{ color: 'var(--accent-danger)' }}>Transcription failed. Please try again.</span>}
+                {!['init', 'decoding', 'loading', 'transcribing', 'error'].includes(progress.status) && `Processing: ${progress.status}`}
+              </>
+            )}
             {!isRecording && !isTranscribing && "Click the button to start recording."}
           </div>
+
         </div>
 
         {/* Post-Transcription UI */}

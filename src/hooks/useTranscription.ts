@@ -42,6 +42,14 @@ export function useTranscription() {
                         break;
                 }
             });
+
+
+            worker.current.addEventListener('error', (err) => {
+                console.error('Critical worker error:', err);
+                setIsTranscribing(false);
+                setProgress({ status: 'error' });
+            });
+
         }
 
         return () => {
@@ -53,9 +61,14 @@ export function useTranscription() {
     const decodeAudioData = async (audioBlob: Blob): Promise<Float32Array> => {
         const arrayBuffer = await audioBlob.arrayBuffer();
         const audioContext = new window.AudioContext({ sampleRate: 16000 });
-        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-        return audioBuffer.getChannelData(0);
+        try {
+            const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+            return audioBuffer.getChannelData(0);
+        } finally {
+            await audioContext.close();
+        }
     };
+
 
     const startRecording = useCallback(async () => {
         try {
@@ -68,19 +81,28 @@ export function useTranscription() {
             };
 
             mediaRecorder.current.onstop = async () => {
-                const audioBlob = new Blob(audioChunks.current, { type: 'audio/webm' });
-                // Clean up stream tracks
-                stream.getTracks().forEach(track => track.stop());
+                try {
+                    const audioBlob = new Blob(audioChunks.current, { type: 'audio/webm' });
+                    // Clean up stream tracks
+                    stream.getTracks().forEach(track => track.stop());
 
-                // Prepare audio for whisper (Float32Array resampled to 16kHz)
-                setIsTranscribing(true);
-                const floatAudio = await decodeAudioData(audioBlob);
+                    // Prepare audio for whisper (Float32Array resampled to 16kHz)
+                    setIsTranscribing(true);
+                    setProgress({ status: 'decoding' });
+                    const floatAudio = await decodeAudioData(audioBlob);
 
-                worker.current?.postMessage({
-                    type: 'transcribe',
-                    audio: floatAudio
-                });
+                    worker.current?.postMessage({
+                        type: 'transcribe',
+                        audio: floatAudio
+                    }, [floatAudio.buffer]);
+
+                } catch (err) {
+                    console.error('Transcription preparation error:', err);
+                    setIsTranscribing(false);
+                    setProgress({ status: 'error' });
+                }
             };
+
 
             mediaRecorder.current.start();
             setIsRecording(true);
