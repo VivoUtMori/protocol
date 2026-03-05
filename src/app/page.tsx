@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useTranscription } from "@/hooks/useTranscription";
+import { signOut } from "next-auth/react";
 
 export default function Home() {
   const {
@@ -109,10 +110,17 @@ export default function Home() {
           <div className="logo-icon"></div>
           Protocol
         </div>
-        <div className="nav-links">
+        <div className="nav-links" style={{ display: "flex", alignItems: "center" }}>
           <a href="/" className="nav-link active">Dashboard</a>
           <a href="/history" className="nav-link">History</a>
           <a href="/settings" className="nav-link">Settings</a>
+          <button
+            onClick={() => signOut({ callbackUrl: '/login' })}
+            className="nav-link"
+            style={{ background: 'none', border: 'none', cursor: 'pointer', marginLeft: '1rem' }}
+          >
+            Logout
+          </button>
         </div>
       </nav>
 

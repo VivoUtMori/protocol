@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { signOut } from "next-auth/react";
 
 export default function Settings() {
     const [llmUrl, setLlmUrl] = useState("");
