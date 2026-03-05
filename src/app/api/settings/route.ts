@@ -29,23 +29,25 @@ export async function POST(req: Request) {
     }
 
     try {
-        const { llmUrl, llmApiKey, llmModel } = await req.json();
+        const { llmUrl, llmApiKey, llmModel, llmProvider } = await req.json();
 
         const settings = await prisma.settings.upsert({
             where: { userId: session.user.id },
             update: {
                 llmUrl,
                 llmApiKey,
-                llmModel
+                llmModel,
+                llmProvider: llmProvider || 'custom'
             },
             create: {
                 userId: session.user.id,
                 llmUrl,
                 llmApiKey,
                 llmModel,
-                llmProvider: 'custom'
+                llmProvider: llmProvider || 'custom'
             }
         });
+
 
         return NextResponse.json({ message: "Success", settings }, { status: 200 });
     } catch (err) {
