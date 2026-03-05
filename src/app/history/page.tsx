@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { signOut } from "next-auth/react";
+import Link from "next/link";
 
 interface Record {
     id: string;
@@ -71,43 +72,54 @@ export default function History() {
                 </div>
 
                 {loading ? (
-                    <div style={{ color: "var(--text-secondary)" }}>Loading history...</div>
+                    <div style={{ textAlign: 'center', color: "var(--text-secondary)" }}>Loading history...</div>
                 ) : history.length === 0 ? (
-                    <div className="glass-card" style={{ padding: "3rem", textAlign: "center", width: "100%", maxWidth: "600px" }}>
-                        <p style={{ color: "var(--text-muted)" }}>No transcripts saved yet.</p>
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                        <div className="glass-card" style={{ padding: "3rem", textAlign: "center", width: "100%", maxWidth: "600px" }}>
+                            <p style={{ color: "var(--text-muted)" }}>No transcripts saved yet.</p>
+                        </div>
                     </div>
                 ) : (
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(350px, 1fr))", gap: "2rem", width: "100%", maxWidth: "1200px" }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(350px, 1fr))", gap: "2rem", width: "100%", maxWidth: "1200px", margin: '0 auto' }}>
                         {history.map(record => (
-                            <div key={record.id} className="glass-card" style={{ padding: "1.5rem", display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+                            <div key={record.id} className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                                    <h3 style={{ fontSize: "1.1rem", margin: 0, color: "var(--text-primary)" }}>{record.title}</h3>
-                                    <span style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>
-                                        {new Date(record.createdAt).toLocaleDateString()}
-                                    </span>
+                                    <div style={{ flex: 1 }}>
+                                        <Link href={`/history/${record.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                            <h3 style={{ margin: 0, fontSize: "1.25rem", color: "var(--accent-primary)", cursor: 'pointer' }}>
+                                                {record.title || "Untitled Transcript"}
+                                            </h3>
+                                        </Link>
+                                        <p style={{ margin: "0.25rem 0 0 0", fontSize: "0.85rem", color: "var(--text-muted)" }}>
+                                            {new Date(record.createdAt).toLocaleString()}
+                                        </p>
+                                    </div>
+                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                        <Link href={`/history/${record.id}`} className="btn btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}>
+                                            View
+                                        </Link>
+                                        <button
+                                            onClick={() => handleRegenerateSummary(record)}
+                                            className="btn btn-secondary"
+                                            disabled={loadingIds.has(record.id)}
+                                            style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}
+                                        >
+                                            {loadingIds.has(record.id) ? "..." : "Regen"}
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <div style={{ display: "flex", flexDirection: "column", gap: "1rem", flex: 1 }}>
-                                    <div style={{ backgroundColor: "var(--bg-tertiary)", padding: "1.25rem", borderRadius: "var(--radius-md)", border: "1px solid var(--glass-border)", position: "relative" }}>
-                                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
-                                            <p style={{ fontSize: "0.75rem", color: "var(--accent-primary)", margin: 0, fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.05em" }}>Summary</p>
-                                            <button
-                                                className="btn btn-secondary"
-                                                style={{ padding: "0.25rem 0.5rem", fontSize: "0.7rem" }}
-                                                onClick={() => handleRegenerateSummary(record)}
-                                                disabled={loadingIds.has(record.id)}
-                                            >
-                                                {loadingIds.has(record.id) ? "Regenerating..." : "Regenerate"}
-                                            </button>
-                                        </div>
-                                        <p style={{ fontSize: "0.9rem", color: "var(--text-primary)", lineHeight: "1.6", display: "-webkit-box", WebkitLineClamp: 4, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                                    <div style={{ backgroundColor: "var(--bg-tertiary)", padding: "1.25rem", borderRadius: "var(--radius-md)", border: "1px solid var(--glass-border)" }}>
+                                        <p style={{ fontSize: "0.75rem", color: "var(--accent-primary)", margin: "0 0 0.5rem 0", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.05em" }}>Summary</p>
+                                        <p style={{ fontSize: "0.9rem", color: "var(--text-primary)", lineHeight: "1.6", display: "-webkit-box", WebkitLineClamp: 4, WebkitBoxOrient: "vertical", overflow: "hidden", margin: 0 }}>
                                             {record.summary || "No summary yet."}
                                         </p>
                                     </div>
 
                                     <div>
                                         <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginBottom: "0.5rem", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.05em" }}>Transcript Snapshot</p>
-                                        <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", lineHeight: "1.5" }}>
+                                        <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", lineHeight: "1.5", margin: 0 }}>
                                             {record.transcript}
                                         </p>
                                     </div>
@@ -119,7 +131,4 @@ export default function History() {
             </main>
         </div>
     );
-
 }
-
-
